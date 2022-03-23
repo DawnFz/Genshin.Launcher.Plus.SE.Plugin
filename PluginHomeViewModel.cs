@@ -10,7 +10,6 @@ using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.VisualBasic.Devices;
 using Snap.Core.DependencyInjection;
 using Snap.Data.Primitive;
-using Snap.Exception;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,8 +26,8 @@ using System.Windows.Media;
 
 namespace Genshin.Launcher.Plus.SE.Plugin
 {
-    [ViewModel(InjectAs.Transient)]
-    public class PluginHomeViewModel : ObservableObject, ILaunchService
+    [Obsolete("请实现 LaunchServie2 ")][ViewModel(InjectAs.Transient)]
+    public class PluginHomeViewModel : ObservableObject
     {
         //转换文件列表
         private string[] globalfiles = new string[]
@@ -333,7 +332,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             return notError;
         }
 
-
         //替换客户端文件
         private async Task ReplaceGameClientFile(string[] originalfile, string[] newfile, string port)
         {
@@ -491,51 +489,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 hex4Result = hex4Result.Replace(@"\", @"\\");
             }
             return Regex.Unescape(hex4Result);
-        }
-
-        public Task LaunchAsync(LaunchOption option, Action<Exception> failAction)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void OpenOfficialLauncher(Action<Exception>? failAction)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SaveLaunchScheme(LaunchScheme? scheme)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string? SelectLaunchDirectoryIfIncorrect(string? launcherPath)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SaveAllAccounts(IEnumerable<GenshinAccount> accounts)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ObservableCollection<GenshinAccount> LoadAllAccount()
-        {
-            throw new NotImplementedException();
-        }
-
-        public GenshinAccount? GetFromRegistry()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool SetToRegistry(GenshinAccount? account)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetTargetFPSDynamically(int targetFPS)
-        {
-            throw new NotImplementedException();
         }
     }
 }

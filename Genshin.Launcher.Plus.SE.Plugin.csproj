@@ -23,6 +23,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove=".git" />
+    <None Remove=".gitattributes" />
+    <None Remove=".gitignore" />
+    <None Remove="LICENSE" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\DGP.Genshin\DGP.Genshin.csproj">
       <Version>0.0.0.0</Version>
       <Private>false</Private>
