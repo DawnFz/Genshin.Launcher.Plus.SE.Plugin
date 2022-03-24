@@ -1,5 +1,4 @@
-﻿using DGP.Genshin.Control.Infrastructure.Observable;
-using DGP.Genshin.Core.ImplementationSwitching;
+﻿using DGP.Genshin.Core.ImplementationSwitching;
 using DGP.Genshin.DataModel.Launching;
 using DGP.Genshin.FPSUnlocking;
 using DGP.Genshin.Helper;
@@ -8,6 +7,7 @@ using DGP.Genshin.Service.Abstraction.Setting;
 using IniParser;
 using IniParser.Exceptions;
 using IniParser.Model;
+using Microsoft;
 using Microsoft.AppCenter.Crashes;
 using Microsoft.VisualStudio.Threading;
 using Microsoft.Win32;
@@ -16,7 +16,6 @@ using Snap.Core.Logging;
 using Snap.Data.Json;
 using Snap.Data.Primitive;
 using Snap.Data.Utility;
-using Snap.Exception;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,7 +26,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace Genshin.Launcher.Plus.SE.Plugin
 {
@@ -89,12 +87,11 @@ namespace Genshin.Launcher.Plus.SE.Plugin
 
         public IniData LauncherConfig
         {
-            get => launcherConfig ?? throw new ArgumentNullException("启动器路径不能为 null");
+            get => Requires.NotNull(launcherConfig!, nameof(launcherConfig));
         }
-
         public IniData GameConfig
         {
-            get => gameConfig ?? throw new ArgumentNullException("启动器路径不能为 null");
+            get => Requires.NotNull(gameConfig!, nameof(gameConfig));
         }
 
         public WorkWatcher GameWatcher { get; } = new();
@@ -146,32 +143,23 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             return parser.ReadFile(file);
         }
 
-
         private Unlocker? unlocker;
 
         public async Task LaunchAsync(LaunchOption option, Action<Exception> failAction)
         {
-
-
-            string? launcherPath = Setting2.LauncherPath.Get();
+            string? launcherPath = Setting2.LauncherPath;
             if (launcherPath is not null)
             {
                 string unescapedGameFolder = GetUnescapedGameFolderFromLauncherConfig();
-                string gamePath;
-                if (File.Exists(Path.Combine(unescapedGameFolder, "GenshinImpact.exe")))
-                {
-                    gamePath = Path.Combine(unescapedGameFolder, "GenshinImpact.exe");
-                }
-                else
-                {
-                    gamePath = Path.Combine(unescapedGameFolder, LauncherConfig[LauncherSection][GameName]);
-                }
-
+                //判断是否为国际服
+                string gamePath = File.Exists(Path.Combine(unescapedGameFolder, "GenshinImpact.exe"))
+                    ? Path.Combine(unescapedGameFolder, "GenshinImpact.exe")
+                    : Path.Combine(unescapedGameFolder, LauncherConfig[LauncherSection][GameName]);
                 try
                 {
                     if (GameWatcher.IsWorking)
                     {
-                        throw new SnapGenshinInternalException("游戏已经启动");
+                        throw new Exception("游戏已经启动");
                     }
                     //https://docs.unity.cn/cn/current/Manual/CommandLineArguments.html
                     string commandLine = new CommandLineBuilder()
@@ -216,7 +204,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 }
             }
         }
-
         /// <summary>
         /// 动态更改FPS，仅在使用解锁帧率后有效
         /// </summary>
@@ -228,7 +215,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 unlocker.TargetFPS = targetFPS;
             }
         }
-
         public void OpenOfficialLauncher(Action<Exception>? failAction)
         {
             string? launcherPath = Setting2.LauncherPath.Get();
@@ -247,7 +233,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 failAction?.Invoke(ex);
             }
         }
-
         /// <summary>
         /// 还原转义后的原游戏目录
         /// 目录符号应为/
@@ -265,7 +250,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             }
             return Regex.Unescape(hex4Result);
         }
-
         public string? SelectLaunchDirectoryIfIncorrect(string? launcherPath)
         {
             if (!File.Exists(launcherPath) || Path.GetFileName(launcherPath) != LauncherExecutable)
@@ -291,7 +275,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             }
             return launcherPath;
         }
-
         public void SaveLaunchScheme(LaunchScheme? scheme)
         {
             if (scheme is null)
@@ -301,30 +284,27 @@ namespace Genshin.Launcher.Plus.SE.Plugin
 
             string unescapedGameFolder = GetUnescapedGameFolderFromLauncherConfig();
             string configFilePath = Path.Combine(unescapedGameFolder, ConfigFileName);
-            if (GameWatcher.IsWorking)
+            Assumes.False(GameWatcher.IsWorking, "游戏已经启动");
+            switch (scheme.GetSchemeType())
             {
-                throw new SnapGenshinInternalException("游戏已经启动");
-            }
-            switch (scheme.CPS)
-            {
-                case "mihoyo":
+                case SchemeType.Mihoyo:
                     if (!File.Exists(Path.Combine(unescapedGameFolder, "GenshinImpact.exe")))
                     {
-                        //await new ContentDialog() { Title = "test", PrimaryButtonText = "Ok" }.ShowAsync();
                         DGP.Genshin.App.Current.Dispatcher.Invoke(async () => await new ConvertDialog().ShowAsync()).Forget();
+
                         if (File.Exists(Path.Combine(unescapedGameFolder, "GenshinImpact_Data/Plugins/PCGameSDK.dll")))
                         {
                             File.Delete(Path.Combine(unescapedGameFolder, "GenshinImpact_Data/Plugins/PCGameSDK.dll"));
                         }
                     }
                     break;
-                case "bilibili":
+                case SchemeType.Bilibili:
                     if (!File.Exists(Path.Combine(unescapedGameFolder, "YuanShen_Data/Plugins/PCGameSDK.dll")))
                     {
                         new ContentDialog() { Title = "哔哩哔哩SDK不存在", PrimaryButtonText = "确定" }.ShowAsync().Forget();
                     }
                     break;
-                case "pcadbdpz":
+                case SchemeType.Officical:
                     if (!File.Exists(Path.Combine(unescapedGameFolder, "YuanShen.exe")))
                     {
                         //await new ContentDialog() { Title = "test", PrimaryButtonText = "Ok" }.ShowAsync();
@@ -341,9 +321,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             GameConfig[GeneralSection][SubChannel] = scheme.SubChannel;
             //new UTF8Encoding(false) compat with https://github.com/DawnFz/GenShin-LauncherDIY
             new FileIniDataParser().WriteFile(configFilePath, GameConfig, new UTF8Encoding(false));
-            //
         }
-
         public ObservableCollection<GenshinAccount> LoadAllAccount()
         {
             //fix load file failure while launched by updater in admin
