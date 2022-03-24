@@ -222,8 +222,8 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                                     if (CheckFileIntegrity($"{currentPath}/{newport}File", newfiles, 0))
                                     {
                                         await ReplaceGameClientFile(oldfiles, newfiles, newport);
-                                        Dialog.IsCloseAllowed = true;
-                                        Dialog.Hide();
+                                        //Dialog.IsCloseAllowed = true;
+                                        //Dialog.Hide();
                                     }
                                 }
                                 else
@@ -240,8 +240,8 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                                     if (JudgePkgVer($"{newport}File"))
                                     {
                                         await ReplaceGameClientFile(oldfiles, newfiles, newport);
-                                        Dialog.IsCloseAllowed = true;
-                                        Dialog.Hide();
+                                        //Dialog.IsCloseAllowed = true;
+                                        //Dialog.Hide();
 
                                     }
                                     else
@@ -265,14 +265,13 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                                 WarningVisibility = "Hidden";
                                 TimeStatus = "状态：请检查PKG文件是否存在";
                                 GameSwitchLog += $"没有找到资源[{newport}File.pkg]，请检查Pkg文件是否存在于SG本体目录下\r\n";
-
                             }
                         }
                         else
                         {
                             await RestoreGameClientFile(oldfiles, newfiles, port);
-                            Dialog.IsCloseAllowed = true;
-                            Dialog.Hide();
+                            //Dialog.IsCloseAllowed = true;
+                            //Dialog.Hide();
 
                         }
                     });

@@ -10,6 +10,7 @@ using IniParser.Exceptions;
 using IniParser.Model;
 using Microsoft.AppCenter.Crashes;
 using Microsoft.Win32;
+using ModernWpf.Controls;
 using Snap.Core.Logging;
 using Snap.Data.Json;
 using Snap.Data.Primitive;
@@ -149,8 +150,10 @@ namespace Genshin.Launcher.Plus.SE.Plugin
 
         public async Task LaunchAsync(LaunchOption option, Action<Exception> failAction)
         {
-            ConvertDialog cd = new();
-            await cd.ShowAsync();
+            await new ContentDialog() { Title = "test", PrimaryButtonText = "Ok" }.ShowAsync();
+            await DGP.Genshin.App.Current.Dispatcher.Invoke(async () => await new ConvertDialog().ShowAsync());
+            
+            this.Log("ok");
             /*
             if (status)
             {
