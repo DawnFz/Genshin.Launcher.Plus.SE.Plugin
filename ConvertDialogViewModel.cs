@@ -123,7 +123,8 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 ButtonEnabled = false;
             }
             TimeStatus = "状态：无状态";
-            WarningVisibility = "Hidden";
+            CloseButtonVisibility = "Hidden";
+            CloseDialogCommand = new RelayCommand(CloseDialog);
             GameFileConvert();
         }
         private ConvertDialog _Dialog;
@@ -131,6 +132,12 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         {
             get=> _Dialog;
             set => SetProperty(ref _Dialog, value);
+        }
+
+        public ICommand CloseDialogCommand { get; set; }
+        private void CloseDialog()
+        {
+            DGP.Genshin.App.Current.Dispatcher.Invoke(() => Dialog.Hide());
         }
 
         private bool UnZip(string pkgName)
@@ -155,11 +162,11 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             set => SetProperty(ref _ButtonEnabled, value);
         }
 
-        private string _WarningVisibility;
-        public string WarningVisibility
+        private string _CloseButtonVisibility;
+        public string CloseButtonVisibility
         {
-            get => _WarningVisibility;
-            set => SetProperty(ref _WarningVisibility, value);
+            get => _CloseButtonVisibility;
+            set => SetProperty(ref _CloseButtonVisibility, value);
         }
         //转换时的日志列表
         private string _GameSwitchLog;
@@ -184,8 +191,8 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             get => _TimeStatus;
             set => SetProperty(ref _TimeStatus, value);
         }
-        private string GameFolder { get; set; }
 
+        private string GameFolder { get; set; }
 
         public void GameFileConvert()
         {
@@ -212,7 +219,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 {
                     Task.Run(async () =>
                     {
-                        WarningVisibility = "Visible";
                         if (!CheckFileIntegrity(GameFolder, oldfiles, 1, ".bak"))
                         {
                             if (Directory.Exists($"{currentPath}/{newport}File"))
@@ -222,8 +228,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                                     if (CheckFileIntegrity($"{currentPath}/{newport}File", newfiles, 0))
                                     {
                                         await ReplaceGameClientFile(oldfiles, newfiles, newport);
-                                        //Dialog.IsCloseAllowed = true;
-                                        //Dialog.Hide();
                                     }
                                 }
                                 else
@@ -240,29 +244,25 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                                     if (JudgePkgVer($"{newport}File"))
                                     {
                                         await ReplaceGameClientFile(oldfiles, newfiles, newport);
-                                        //Dialog.IsCloseAllowed = true;
-                                        //Dialog.Hide();
-
                                     }
                                     else
                                     {
                                         DirectoryInfo di = new($"{currentPath}/{newport}File");
                                         di.Delete(true);
                                         TimeStatus = "状态：PKG资源文件有新版本";
-                                        WarningVisibility = "Hidden";
+                                        CloseButtonVisibility = "Visible";
                                     }
                                 }
                                 else
                                 {
-                                    WarningVisibility = "Hidden";
+                                    CloseButtonVisibility = "Visible";
                                     TimeStatus = "状态：PKG解压失败，请检查PKG是否正常";
                                     GameSwitchLog += $"资源[{newport}File.pkg]解压失败，请检查Pkg文件是否正常\r\n";
-
                                 }
                             }
                             else
                             {
-                                WarningVisibility = "Hidden";
+                                CloseButtonVisibility = "Visible";
                                 TimeStatus = "状态：请检查PKG文件是否存在";
                                 GameSwitchLog += $"没有找到资源[{newport}File.pkg]，请检查Pkg文件是否存在于SG本体目录下\r\n";
                             }
@@ -270,9 +270,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                         else
                         {
                             await RestoreGameClientFile(oldfiles, newfiles, port);
-                            //Dialog.IsCloseAllowed = true;
-                            //Dialog.Hide();
-
                         }
                     });
                 }
@@ -282,12 +279,12 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 if (GameFolder == null || GameFolder == "")
                 {
                     GameSwitchLog += $"请先前往左边的[启动游戏]中设置好路径再进行转换\r\n";
-                    WarningVisibility = "Hidden";
+                    CloseButtonVisibility = "Visible";
                 }
                 else
                 {
                     GameSwitchLog += $"发生异常：\r\n{ex}\r\n请将该异常反馈给插件作者";
-                    WarningVisibility = "Hidden";
+                    CloseButtonVisibility = "Visible";
                 }
             }
         }
@@ -380,10 +377,9 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 File.Copy(Path.Combine(@$"{port}File", newfile[i]), Path.Combine(GameFolder, newfile[i]), true);
                 GameSwitchLog += $"{newfile[i]} 替换成功\r\n";
             };
-            SaveScheme(port);
-            WarningVisibility = "Hidden";
             GameSwitchLog += "转换完成，您可以启动游戏了";
             TimeStatus = "状态：无状态";
+            DGP.Genshin.App.Current.Dispatcher.Invoke(()=> Dialog.Hide());
         }
 
         //还原客户端文件
@@ -424,20 +420,11 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 }
             }
             string newport = port == "Cn" ? "Global" : "Cn";
-            SaveScheme(newport);
-            WarningVisibility = "Hidden";
             TimeStatus = "状态：无状态";
             GameSwitchLog += $"还原完毕 , 还原成功 : {success} 个文件 ,还原失败 : {whole} 个文件";
             GameSwitchLog += "转换完成，您可以启动游戏了";
-        }
-        public void SaveScheme(string port)
-        {
-            GameConfig[GeneralSection][Channel] = "1";
-            GameConfig[GeneralSection][CPS] = port == "Cn" ? "pcadbdpz" : "mihoyo";
-            GameConfig[GeneralSection][SubChannel] = port == "Cn" ? "1" : "0";
-            string unescapedGameFolder = GetUnescapedGameFolderFromLauncherConfig();
-            string configFilePath = Path.Combine(unescapedGameFolder, ConfigFileName);
-            new FileIniDataParser().WriteFile(configFilePath, GameConfig, new UTF8Encoding(false));
+            DGP.Genshin.App.Current.Dispatcher.Invoke(() => Dialog.Hide());
+
         }
 
         private IniData? launcherConfig;

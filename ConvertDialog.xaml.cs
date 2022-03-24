@@ -23,7 +23,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
     {
         public ConvertDialog()
         {
-            //DataContext = new ConvertDialogViewModel(this);
+            DataContext = new ConvertDialogViewModel(this);
             InitializeComponent();
         }
     }

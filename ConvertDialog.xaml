@@ -8,12 +8,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Genshin.Launcher.Plus.SE.Plugin"
         mc:Ignorable="d"
-        PrimaryButtonText="确认"
         Title="转换客户端" d:Height="450" d:Width="800">
     <Grid Margin="10" Width="470" Height="280">
         <Grid.RowDefinitions>
             <RowDefinition Height="10*"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
@@ -27,6 +26,7 @@
                 </b:EventTrigger>
             </b:Interaction.Triggers>
         </TextBox>
-        <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,5,0,0" d:Text="状态：设计状态" Text="{Binding TimeStatus}"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,15,0,0" d:Text="状态：设计状态" Text="{Binding TimeStatus}"/>
+        <Button Grid.Row="1" Grid.Column="1" Content="关闭" Width="72" HorizontalAlignment="Right" Visibility="{Binding CloseButtonVisibility}" Command="{Binding CloseDialogCommand}"/>
     </Grid>
 </ui:ContentDialog>
