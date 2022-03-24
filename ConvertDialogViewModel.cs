@@ -26,8 +26,8 @@ using System.Windows.Media;
 
 namespace Genshin.Launcher.Plus.SE.Plugin
 {
-    [Obsolete("请实现 LaunchServie2 ")][ViewModel(InjectAs.Transient)]
-    public class PluginHomeViewModel : ObservableObject
+    [ViewModel(InjectAs.Transient)]
+    public class ConvertDialogViewModel : ObservableObject
     {
         //转换文件列表
         private string[] globalfiles = new string[]
@@ -105,13 +105,14 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         private const string ConfigFileName = "config.ini";
         private const string LauncherExecutable = "launcher.exe";
 
-        public PluginHomeViewModel()
+        public ConvertDialogViewModel(ConvertDialog dialog)
         {
-            ReadHtmlHelper readHtmlHelper = new ReadHtmlHelper();
+            Dialog = dialog;
+            ReadHtmlHelper readHtmlHelper = new();
             string? launcherPath = Setting2.LauncherPath;
             TryLoadIniData(launcherPath);
             pkgVer = readHtmlHelper.GetFromHtml("pkg");
-            if(GameFolder!=null&&GameFolder!=string.Empty)
+            if (GameFolder != null && GameFolder != string.Empty)
             {
                 GameSwitchLog += $"已成功识别到游戏路径：{GameFolder}\r\n当前Pkg最新版本号为：{pkgVer}\r\n";
                 ButtonEnabled = true;
@@ -121,8 +122,15 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 GameSwitchLog += $"未识别到游戏路径，请先前往左边的[启动游戏]中设置好路径再使用本插件\r\n";
                 ButtonEnabled = false;
             }
+            TimeStatus = "状态：无状态";
             WarningVisibility = "Hidden";
-            GameFileConvertCommand = new RelayCommand(GameFileConvert);
+            GameFileConvert();
+        }
+        private ConvertDialog _Dialog;
+        public ConvertDialog Dialog
+        {
+            get=> _Dialog;
+            set => SetProperty(ref _Dialog, value);
         }
 
         private bool UnZip(string pkgName)
@@ -143,8 +151,8 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         private bool _ButtonEnabled;
         public bool ButtonEnabled
         {
-            get=> _ButtonEnabled;
-            set=> SetProperty(ref _ButtonEnabled, value);
+            get => _ButtonEnabled;
+            set => SetProperty(ref _ButtonEnabled, value);
         }
 
         private string _WarningVisibility;
@@ -176,13 +184,10 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             get => _TimeStatus;
             set => SetProperty(ref _TimeStatus, value);
         }
-
         private string GameFolder { get; set; }
 
 
-        public ICommand GameFileConvertCommand { get; set; }
-
-        private void GameFileConvert()
+        public void GameFileConvert()
         {
             try
             {
@@ -217,6 +222,8 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                                     if (CheckFileIntegrity($"{currentPath}/{newport}File", newfiles, 0))
                                     {
                                         await ReplaceGameClientFile(oldfiles, newfiles, newport);
+                                        Dialog.IsCloseAllowed = true;
+                                        Dialog.Hide();
                                     }
                                 }
                                 else
@@ -233,6 +240,9 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                                     if (JudgePkgVer($"{newport}File"))
                                     {
                                         await ReplaceGameClientFile(oldfiles, newfiles, newport);
+                                        Dialog.IsCloseAllowed = true;
+                                        Dialog.Hide();
+
                                     }
                                     else
                                     {
@@ -247,6 +257,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                                     WarningVisibility = "Hidden";
                                     TimeStatus = "状态：PKG解压失败，请检查PKG是否正常";
                                     GameSwitchLog += $"资源[{newport}File.pkg]解压失败，请检查Pkg文件是否正常\r\n";
+
                                 }
                             }
                             else
@@ -254,11 +265,15 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                                 WarningVisibility = "Hidden";
                                 TimeStatus = "状态：请检查PKG文件是否存在";
                                 GameSwitchLog += $"没有找到资源[{newport}File.pkg]，请检查Pkg文件是否存在于SG本体目录下\r\n";
+
                             }
                         }
                         else
                         {
                             await RestoreGameClientFile(oldfiles, newfiles, port);
+                            Dialog.IsCloseAllowed = true;
+                            Dialog.Hide();
+
                         }
                     });
                 }
@@ -277,7 +292,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 }
             }
         }
-
         //转换国际服及转换国服核心逻辑-判断客户端
         private string JudgeGamePort()
         {

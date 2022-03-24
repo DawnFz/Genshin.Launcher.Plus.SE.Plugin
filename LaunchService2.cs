@@ -1,4 +1,5 @@
-﻿using DGP.Genshin.Core.ImplementationSwitching;
+﻿using DGP.Genshin.Control.Infrastructure.Observable;
+using DGP.Genshin.Core.ImplementationSwitching;
 using DGP.Genshin.DataModel.Launching;
 using DGP.Genshin.FPSUnlocking;
 using DGP.Genshin.Helper;
@@ -24,10 +25,11 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Genshin.Launcher.Plus.SE.Plugin
 {
-    [SwitchableImplementation(typeof(ILaunchService),"Genshin.Launcher.Plus","原P启动器实现")]
+    [SwitchableImplementation(typeof(ILaunchService),"Genshin.Launcher.Plus","原神启动器Plus")]
     public class LaunchService2 : ILaunchService
     {
         private const string AccountsFileName = "accounts.json";
@@ -141,11 +143,24 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             parser.Parser.Configuration.AssigmentSpacer = string.Empty;
             return parser.ReadFile(file);
         }
+        
 
         private Unlocker? unlocker;
 
         public async Task LaunchAsync(LaunchOption option, Action<Exception> failAction)
         {
+            ConvertDialog cd = new();
+            await cd.ShowAsync();
+            /*
+            if (status)
+            {
+                MessageBox.Show("成功");
+            }
+            else
+            {
+                MessageBox.Show("失败");
+            }
+            /*
             string? launcherPath = Setting2.LauncherPath.Get();
             if (launcherPath is not null)
             {
@@ -199,7 +214,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 {
                     failAction.Invoke(ex);
                 }
-            }
+            }*/
         }
 
         /// <summary>
