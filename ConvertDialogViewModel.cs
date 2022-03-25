@@ -16,6 +16,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace Genshin.Launcher.Plus.SE.Plugin
@@ -138,11 +139,12 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         private string PackageVersion { get; set; } = string.Empty;
         private string GameFolder { get; set; } = string.Empty;
 
+        private readonly ConvertDialog dialog;
         public ConvertDialogViewModel(ConvertDialog dialog)
         {
+            this.dialog = dialog;
             string? launcherPath = Setting2.LauncherPath;
             TryLoadIniData(launcherPath);
-
             OpenUICommand = new AsyncRelayCommand(OpenUIAsync);
         }
 
@@ -185,7 +187,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 return false;
             }
         }
-
 
         /// <summary>
         /// 转换游戏文件
@@ -282,6 +283,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             finally
             {
                 IsCloseButtonEnabled = true;
+                dialog.IsCloseAllowed = true;
             }
         }
 
@@ -364,13 +366,13 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             StateIndicator = "状态：备份原始客户端中";
             for (int a = 0; a < originalfile.Length; a++)
             {
-                string newFileName = Path.GetFileName(Path.Combine(GameFolder, originalfile[a]));
+                string newFileName = Path.Combine(GameFolder, originalfile[a]);
 
                 if (File.Exists(Path.Combine(GameFolder, originalfile[a])))
                 {
                     try
                     {
-                        File.Move(Path.Combine(GameFolder, originalfile[a]), newFileName + ".bak");
+                        File.Move(newFileName, newFileName + ".bak");
                         SwitchLog += $"{newFileName} 备份成功\r\n";
                     }
                     catch (Exception ex)
@@ -388,7 +390,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             string originalGameDataFolder = scheme == GlobalFolderName ? YuanShenDataFolderName : GenshinImpactDataFolderName;
             string newGameDataFolder = scheme == GlobalFolderName ? GenshinImpactDataFolderName : YuanShenDataFolderName;
 
-            Directory.Move(Path.Combine(GameFolder, originalGameDataFolder), newGameDataFolder);
+            Directory.Move(Path.Combine(GameFolder, originalGameDataFolder), Path.Combine(GameFolder, newGameDataFolder));
             for (int i = 0; i < newfile.Length; i++)
             {
                 File.Copy(Path.Combine(@$"{scheme}File", newfile[i]), Path.Combine(GameFolder, newfile[i]), true);
@@ -426,14 +428,14 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             string nowGameDataFolder = scheme == GlobalFolderName ? GenshinImpactDataFolderName : YuanShenDataFolderName;
             string originalGameDataFolder = scheme == GlobalFolderName ? YuanShenDataFolderName : GenshinImpactDataFolderName;
 
-            Directory.Move(Path.Combine(GameFolder, nowGameDataFolder), originalGameDataFolder);
+            Directory.Move(Path.Combine(GameFolder, nowGameDataFolder), Path.Combine(GameFolder, originalGameDataFolder));
             int total = 0, success = 0;
             for (int a = 0; a < originalfile.Length; a++)
             {
-                string newFileName = Path.GetFileNameWithoutExtension(originalfile[a]) + Path.GetExtension(originalfile[a]);
+                string newFileName = Path.Combine(GameFolder, originalfile[a]);
                 if (File.Exists(Path.Combine(GameFolder, originalfile[a] + ".bak")))
                 {
-                    Directory.Move(Path.Combine(GameFolder, originalfile[a] + ".bak"), newFileName);
+                    Directory.Move(newFileName + ".bak", newFileName);
                     SwitchLog += $"{originalfile[a]} 还原成功\r\n";
                     success++;
                 }
@@ -445,7 +447,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             }
 
             StateIndicator = "状态：无状态";
-            SwitchLog += $"还原完毕 , 还原成功 : {success} 个文件 ,还原失败 : {total} 个文件";
+            SwitchLog += $"还原完毕 , 还原成功 : {success} 个文件 ,还原失败 : {total} 个文件\r\n";
             SwitchLog += "转换完成，您可以启动游戏了";
         }
 

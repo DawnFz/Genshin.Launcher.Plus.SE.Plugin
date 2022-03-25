@@ -9,10 +9,21 @@
 
 ### 使用方法：
 
-前往 [Releases页面](https://github.com/DawnFz/Genshin.Launcher.Plus.SE.Plugin/releases) 下载编译好并发布的DLL文件，放入SG目录下的Plugins文件夹中，重新启动SG即可在左侧找到本插件并使用
+前往 [Releases页面](https://github.com/DawnFz/Genshin.Launcher.Plus.SE.Plugin/releases) 下载编译好并发布的DLL文件，放入SG目录下的Plugins文件夹中，重新启动SG检查插件是否加载，本插件仅提供LaunchService启动服务，在SG左侧没有界面入口，您可以在插件管理页检查是否成功加载。插件加载后您需要进入 [设置] --> [应用服务实现] 中将启动游戏服务切换到 [原神启动器Plus] 即可使用。切换完成后您即可在SG左侧启动游戏栏目中选择服务器切换，国服、国际服切换需要Pkg文件支持
+
+PKG转换资源下载地址及访问密码: etxd
+https://pan.baidu.com/s/1-5zQoVfE7ImdXrn8OInKqg
 
 ### 预览图：
 
-界面就先这样了，到时候有时间再优化（（如果有大佬Pr就更好了 o(*≧▽≦)ツ
+![截图](https://s2.loli.net/2022/03/25/YpTbyWoq1i79hvE.jpg)
 
-![预览](https://s2.loli.net/2022/03/23/YIP15lUo4LzR9tr.jpg)
+![截图](https://s2.loli.net/2022/03/25/o5q8J2ZzC3hBSL4.jpg)
+
+
+
+### 版本迭代：
+
+1.0.0.0 - 测试发布
+
+1.0.3.1 - 修改了大部分逻辑，支持新版SG
