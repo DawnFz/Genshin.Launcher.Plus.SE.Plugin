@@ -9,7 +9,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
     {
         private const string Url = "https://www.cnblogs.com/DawnFz/p/7271382.html";
 
-        private async Task<string> ReadHTMLAsTextAsync(string url)
+        private static async Task<string> ReadHTMLAsTextAsync(string url)
         {
             try
             {
@@ -26,7 +26,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 return string.Empty;
             }
         }
-        private string Mid(string str, string preStr, string nextStr)
+        private static string Mid(string str, string preStr, string nextStr)
         {
             try
             {
