@@ -87,11 +87,11 @@ namespace Genshin.Launcher.Plus.SE.Plugin
 
         public IniData LauncherConfig
         {
-            get => Requires.NotNull(launcherConfig!, nameof(launcherConfig));
+            get => Requires.NotNull(this.launcherConfig!, nameof(this.launcherConfig));
         }
         public IniData GameConfig
         {
-            get => Requires.NotNull(gameConfig!, nameof(gameConfig));
+            get => Requires.NotNull(this.gameConfig!, nameof(this.gameConfig));
         }
 
         public WorkWatcher GameWatcher { get; } = new();
@@ -100,7 +100,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         {
             PathContext.CreateFileOrIgnore(AccountsFileName);
             string? launcherPath = Setting2.LauncherPath;
-            TryLoadIniData(launcherPath);
+            this.TryLoadIniData(launcherPath);
         }
 
         [MemberNotNullWhen(true, nameof(gameConfig)), MemberNotNullWhen(true, nameof(launcherConfig))]
@@ -111,10 +111,10 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 try
                 {
                     string configPath = Path.Combine(Path.GetDirectoryName(launcherPath)!, ConfigFileName);
-                    launcherConfig = GetIniData(configPath);
+                    this.launcherConfig = this.GetIniData(configPath);
 
-                    string unescapedGameFolder = GetUnescapedGameFolderFromLauncherConfig();
-                    gameConfig = GetIniData(Path.Combine(unescapedGameFolder, ConfigFileName));
+                    string unescapedGameFolder = this.GetUnescapedGameFolderFromLauncherConfig();
+                    this.gameConfig = this.GetIniData(Path.Combine(unescapedGameFolder, ConfigFileName));
                 }
                 catch (ParsingException) { return false; }
                 catch (ArgumentNullException) { return false; }
@@ -150,14 +150,14 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             string? launcherPath = Setting2.LauncherPath;
             if (launcherPath is not null)
             {
-                string unescapedGameFolder = GetUnescapedGameFolderFromLauncherConfig();
+                string unescapedGameFolder = this.GetUnescapedGameFolderFromLauncherConfig();
                 //判断是否为国际服
                 string gamePath = File.Exists(Path.Combine(unescapedGameFolder, "GenshinImpact.exe"))
                     ? Path.Combine(unescapedGameFolder, "GenshinImpact.exe")
-                    : Path.Combine(unescapedGameFolder, LauncherConfig[LauncherSection][GameName]);
+                    : Path.Combine(unescapedGameFolder, this.LauncherConfig[LauncherSection][GameName]);
                 try
                 {
-                    if (GameWatcher.IsWorking)
+                    if (this.GameWatcher.IsWorking)
                     {
                         throw new Exception("游戏已经启动");
                     }
@@ -181,12 +181,12 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                         }
                     };
 
-                    using (GameWatcher.Watch())
+                    using (this.GameWatcher.Watch())
                     {
                         if (option.UnlockFPS)
                         {
-                            unlocker = new(game, option.TargetFPS);
-                            UnlockResult result = await unlocker.StartProcessAndUnlockAsync();
+                            this.unlocker = new(game, option.TargetFPS);
+                            UnlockResult result = await this.unlocker.StartProcessAndUnlockAsync();
                             this.Log(result);
                         }
                         else
@@ -210,9 +210,9 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         /// <param name="targetFPS"></param>
         public void SetTargetFPSDynamically(int targetFPS)
         {
-            if (unlocker is not null)
+            if (this.unlocker is not null)
             {
-                unlocker.TargetFPS = targetFPS;
+                this.unlocker.TargetFPS = targetFPS;
             }
         }
         public void OpenOfficialLauncher(Action<Exception>? failAction)
@@ -241,7 +241,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         /// <returns></returns>
         private string GetUnescapedGameFolderFromLauncherConfig()
         {
-            string gameInstallPath = LauncherConfig[LauncherSection][GameInstallPath];
+            string gameInstallPath = this.LauncherConfig[LauncherSection][GameInstallPath];
             string? hex4Result = Regex.Replace(gameInstallPath, @"\\x([0-9a-f]{4})", @"\u$1");
             if (!hex4Result.Contains(@"\u"))//不包含中文
             {
@@ -282,9 +282,9 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 return;
             }
 
-            string unescapedGameFolder = GetUnescapedGameFolderFromLauncherConfig();
+            string unescapedGameFolder = this.GetUnescapedGameFolderFromLauncherConfig();
             string configFilePath = Path.Combine(unescapedGameFolder, ConfigFileName);
-            Assumes.False(GameWatcher.IsWorking, "游戏已经启动");
+            Assumes.False(this.GameWatcher.IsWorking, "游戏已经启动");
             switch (scheme.GetSchemeType())
             {
                 case SchemeType.Mihoyo:
@@ -316,11 +316,11 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                     }
                     break;
             }
-            GameConfig[GeneralSection][Channel] = scheme.Channel;
-            GameConfig[GeneralSection][CPS] = scheme.CPS;
-            GameConfig[GeneralSection][SubChannel] = scheme.SubChannel;
+            this.GameConfig[GeneralSection][Channel] = scheme.Channel;
+            this.GameConfig[GeneralSection][CPS] = scheme.CPS;
+            this.GameConfig[GeneralSection][SubChannel] = scheme.SubChannel;
             //new UTF8Encoding(false) compat with https://github.com/DawnFz/GenShin-LauncherDIY
-            new FileIniDataParser().WriteFile(configFilePath, GameConfig, new UTF8Encoding(false));
+            new FileIniDataParser().WriteFile(configFilePath, this.GameConfig, new UTF8Encoding(false));
         }
         public ObservableCollection<GenshinAccount> LoadAllAccount()
         {

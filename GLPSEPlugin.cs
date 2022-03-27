@@ -40,9 +40,20 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         #endregion
 
         #region IPlugin2
-        public string? DetailLink => "https://github.com/DawnFz/Genshin.Launcher.Plus.SE.Plugin";
-        public bool IsSettingSupported => false;
-        public ICommand SettingCommand => null!;
+        public string? DetailLink
+        {
+            get => "https://github.com/DawnFz/Genshin.Launcher.Plus.SE.Plugin";
+        }
+
+        public bool IsSettingSupported
+        {
+            get => false;
+        }
+
+        public ICommand SettingCommand
+        {
+            get => null!;
+        }
         #endregion
     }
 }

@@ -7,7 +7,6 @@ using Microsoft.AppCenter.Crashes;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Uwp.Notifications;
-using Microsoft.VisualBasic.Devices;
 using Snap.Core.DependencyInjection;
 using Snap.Data.Utility;
 using System;
@@ -16,7 +15,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace Genshin.Launcher.Plus.SE.Plugin
@@ -108,29 +106,29 @@ namespace Genshin.Launcher.Plus.SE.Plugin
 
         public bool ButtonEnabled
         {
-            get => buttonEnabled;
-            set => SetProperty(ref buttonEnabled, value);
+            get => this.buttonEnabled;
+            set => this.SetProperty(ref this.buttonEnabled, value);
         }
         public bool IsCloseButtonEnabled
         {
-            get => isCloseButtonEnabled;
-            set => SetProperty(ref isCloseButtonEnabled, value);
+            get => this.isCloseButtonEnabled;
+            set => this.SetProperty(ref this.isCloseButtonEnabled, value);
         }
         /// <summary>
         /// 转换时的日志列表
         /// </summary>
         public string SwitchLog
         {
-            get => switchLog;
-            set => SetProperty(ref switchLog, value);
+            get => this.switchLog;
+            set => this.SetProperty(ref this.switchLog, value);
         }
         /// <summary>
         /// 转换状态
         /// </summary>
         public string StateIndicator
         {
-            get => stateIndicator;
-            set => SetProperty(ref stateIndicator, value);
+            get => this.stateIndicator;
+            set => this.SetProperty(ref this.stateIndicator, value);
         }
 
         public ICommand OpenUICommand { get; }
@@ -144,8 +142,8 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         {
             this.dialog = dialog;
             string? launcherPath = Setting2.LauncherPath;
-            TryLoadIniData(launcherPath);
-            OpenUICommand = new AsyncRelayCommand(OpenUIAsync);
+            this.TryLoadIniData(launcherPath);
+            this.OpenUICommand = new AsyncRelayCommand(this.OpenUIAsync);
         }
 
         /// <summary>
@@ -154,20 +152,20 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         /// <returns></returns>
         public async Task OpenUIAsync()
         {
-            PackageVersion = await HtmlHelper.GetInfoFromHtmlAsync("pkg");
+            this.PackageVersion = await HtmlHelper.GetInfoFromHtmlAsync("pkg");
 
-            if (!string.IsNullOrEmpty(GameFolder))
+            if (!string.IsNullOrEmpty(this.GameFolder))
             {
-                SwitchLog += $"已成功识别到游戏路径：{GameFolder}\r\n当前Pkg最新版本号为：{PackageVersion}\r\n";
-                ButtonEnabled = true;
+                this.SwitchLog += $"已成功识别到游戏路径：{this.GameFolder}\r\n当前Pkg最新版本号为：{this.PackageVersion}\r\n";
+                this.ButtonEnabled = true;
             }
             else
             {
-                SwitchLog += $"未识别到游戏路径，请先前往左边的[启动游戏]中设置好路径再使用本插件\r\n";
-                ButtonEnabled = false;
+                this.SwitchLog += $"未识别到游戏路径，请先前往左边的[启动游戏]中设置好路径再使用本插件\r\n";
+                this.ButtonEnabled = false;
             }
 
-            await ConvertGameFileAsync();
+            await this.ConvertGameFileAsync();
         }
 
         /// <summary>
@@ -196,7 +194,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             try
             {
                 string currentPath = Environment.CurrentDirectory;
-                string port = GetCurrentSchemeName();
+                string port = this.GetCurrentSchemeName();
                 string newport = port == CnFolderName ? GlobalFolderName : CnFolderName;
 
                 string[]? oldfiles = port switch
@@ -219,15 +217,15 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 {
                     await Task.Run(() =>
                     {
-                        if (!CheckFileIntegrity(GameFolder, oldfiles, 1, ".bak"))
+                        if (!this.CheckFileIntegrity(this.GameFolder, oldfiles, 1, ".bak"))
                         {
                             if (Directory.Exists($"{currentPath}/{newport}File"))
                             {
-                                if (CheckPackageVersion($"{newport}File"))
+                                if (this.CheckPackageVersion($"{newport}File"))
                                 {
-                                    if (CheckFileIntegrity($"{currentPath}/{newport}File", newfiles, 0))
+                                    if (this.CheckFileIntegrity($"{currentPath}/{newport}File", newfiles, 0))
                                     {
-                                        ReplaceGameFiles(oldfiles, newfiles, newport);
+                                        this.ReplaceGameFiles(oldfiles, newfiles, newport);
                                     }
                                 }
                                 else
@@ -237,53 +235,53 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                             }
                             else if (File.Exists($"{currentPath}/{newport}File.pkg"))
                             {
-                                StateIndicator = "状态：解压PKG资源文件中";
-                                if (Decompress(newport))
+                                this.StateIndicator = "状态：解压PKG资源文件中";
+                                if (this.Decompress(newport))
                                 {
-                                    if (CheckPackageVersion($"{newport}File"))
+                                    if (this.CheckPackageVersion($"{newport}File"))
                                     {
-                                        ReplaceGameFiles(oldfiles, newfiles, newport);
+                                        this.ReplaceGameFiles(oldfiles, newfiles, newport);
                                     }
                                     else
                                     {
                                         Directory.Delete($"{currentPath}/{newport}File", true);
-                                        StateIndicator = "状态：PKG资源文件有新版本";
+                                        this.StateIndicator = "状态：PKG资源文件有新版本";
                                     }
                                 }
                                 else
                                 {
-                                    StateIndicator = "状态：PKG解压失败，请检查PKG是否正常";
-                                    SwitchLog += $"资源[{newport}File.pkg]解压失败，请检查Pkg文件是否正常\r\n";
+                                    this.StateIndicator = "状态：PKG解压失败，请检查PKG是否正常";
+                                    this.SwitchLog += $"资源[{newport}File.pkg]解压失败，请检查Pkg文件是否正常\r\n";
                                 }
                             }
                             else
                             {
-                                StateIndicator = "状态：请检查PKG文件是否存在";
-                                SwitchLog += $"没有找到资源[{newport}File.pkg]，请检查Pkg文件是否存在于SG本体目录下\r\n";
+                                this.StateIndicator = "状态：请检查PKG文件是否存在";
+                                this.SwitchLog += $"没有找到资源[{newport}File.pkg]，请检查Pkg文件是否存在于SG本体目录下\r\n";
                             }
                         }
                         else
                         {
-                            RestoreGameFiles(oldfiles, newfiles, port);
+                            this.RestoreGameFiles(oldfiles, newfiles, port);
                         }
                     });
                 }
             }
             catch (Exception ex)
             {
-                if (string.IsNullOrEmpty(GameFolder))
+                if (string.IsNullOrEmpty(this.GameFolder))
                 {
-                    SwitchLog += $"请先前往[启动游戏]中选择正确的路径后再进行转换\r\n";
+                    this.SwitchLog += $"请先前往[启动游戏]中选择正确的路径后再进行转换\r\n";
                 }
                 else
                 {
-                    SwitchLog += $"发生异常：\r\n{ex}\r\n请将该异常反馈给插件作者";
+                    this.SwitchLog += $"发生异常：\r\n{ex}\r\n请将该异常反馈给插件作者";
                 }
             }
             finally
             {
-                IsCloseButtonEnabled = true;
-                dialog.IsCloseAllowed = true;
+                this.IsCloseButtonEnabled = true;
+                this.dialog.IsCloseAllowed = true;
             }
         }
 
@@ -293,11 +291,11 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         /// <returns></returns>
         private string GetCurrentSchemeName()
         {
-            if (File.Exists(Path.Combine(GameFolder, "YuanShen.exe")))
+            if (File.Exists(Path.Combine(this.GameFolder, "YuanShen.exe")))
             {
                 return CnFolderName;
             }
-            else if (File.Exists(Path.Combine(GameFolder, "GenshinImpact.exe")))
+            else if (File.Exists(Path.Combine(this.GameFolder, "GenshinImpact.exe")))
             {
                 return GlobalFolderName;
             }
@@ -314,11 +312,11 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         /// <returns></returns>
         private bool CheckPackageVersion(string scheme)
         {
-            if (!File.Exists($"{Environment.CurrentDirectory}/{scheme}/{PackageVersion}"))
+            if (!File.Exists($"{Environment.CurrentDirectory}/{scheme}/{this.PackageVersion}"))
             {
                 DGP.Genshin.App.Current.Dispatcher.Invoke(() =>
                 new ToastContentBuilder()
-                .AddText($"pkg文件存在新版本：{PackageVersion}")
+                .AddText($"pkg文件存在新版本：{this.PackageVersion}")
                 .AddText("已为您打开下载地址")
                 .Show());
 
@@ -346,11 +344,11 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             {
                 if (File.Exists(Path.Combine(dirpath, filepath[i] + surfix)) == false)
                 {
-                    SwitchLog += $"{filepath[i]} {surfix} 文件不存在，将尝试下一步操作\r\n若无反应请重新下载资源文件！\r\n";
+                    this.SwitchLog += $"{filepath[i]} {surfix} 文件不存在，将尝试下一步操作\r\n若无反应请重新下载资源文件！\r\n";
                     succeed = false;
                     break;
                 }
-                SwitchLog += $"{filepath[i]} {surfix} 存在\r\n";
+                this.SwitchLog += $"{filepath[i]} {surfix} 存在\r\n";
             }
             return succeed;
         }
@@ -363,42 +361,42 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         /// <param name="scheme"></param>
         private void ReplaceGameFiles(string[] originalfile, string[] newfile, string scheme)
         {
-            StateIndicator = "状态：备份原始客户端中";
+            this.StateIndicator = "状态：备份原始客户端中";
             for (int a = 0; a < originalfile.Length; a++)
             {
-                string newFileName = Path.Combine(GameFolder, originalfile[a]);
+                string newFileName = Path.Combine(this.GameFolder, originalfile[a]);
 
-                if (File.Exists(Path.Combine(GameFolder, originalfile[a])))
+                if (File.Exists(Path.Combine(this.GameFolder, originalfile[a])))
                 {
                     try
                     {
                         File.Move(newFileName, newFileName + ".bak");
-                        SwitchLog += $"{newFileName} 备份成功\r\n";
+                        this.SwitchLog += $"{newFileName} 备份成功\r\n";
                     }
                     catch (Exception ex)
                     {
-                        SwitchLog += $"{newFileName} 备份失败：{ex.Message}\r\n";
+                        this.SwitchLog += $"{newFileName} 备份失败：{ex.Message}\r\n";
                     }
                 }
                 else
                 {
-                    SwitchLog += $"{newFileName} 文件不存在，备份失败，跳过\r\n";
+                    this.SwitchLog += $"{newFileName} 文件不存在，备份失败，跳过\r\n";
                 }
             }
 
-            StateIndicator = "状态：正在替换新文件到客户端";
+            this.StateIndicator = "状态：正在替换新文件到客户端";
             string originalGameDataFolder = scheme == GlobalFolderName ? YuanShenDataFolderName : GenshinImpactDataFolderName;
             string newGameDataFolder = scheme == GlobalFolderName ? GenshinImpactDataFolderName : YuanShenDataFolderName;
 
-            Directory.Move(Path.Combine(GameFolder, originalGameDataFolder), Path.Combine(GameFolder, newGameDataFolder));
+            Directory.Move(Path.Combine(this.GameFolder, originalGameDataFolder), Path.Combine(this.GameFolder, newGameDataFolder));
             for (int i = 0; i < newfile.Length; i++)
             {
-                File.Copy(Path.Combine(@$"{scheme}File", newfile[i]), Path.Combine(GameFolder, newfile[i]), true);
-                SwitchLog += $"{newfile[i]} 替换成功\r\n";
+                File.Copy(Path.Combine(@$"{scheme}File", newfile[i]), Path.Combine(this.GameFolder, newfile[i]), true);
+                this.SwitchLog += $"{newfile[i]} 替换成功\r\n";
             };
 
-            SwitchLog += "转换完成，您可以启动游戏了";
-            StateIndicator = "状态：无状态";
+            this.SwitchLog += "转换完成，您可以启动游戏了";
+            this.StateIndicator = "状态：无状态";
         }
 
         /// <summary>
@@ -410,52 +408,52 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         private void RestoreGameFiles(string[] newfile, string[] originalfile, string scheme)
         {
             //Computer redir = new();
-            StateIndicator = "状态：清理多余文件中";
+            this.StateIndicator = "状态：清理多余文件中";
             for (int i = 0; i < newfile.Length; i++)
             {
-                if (File.Exists(Path.Combine(GameFolder, newfile[i])))
+                if (File.Exists(Path.Combine(this.GameFolder, newfile[i])))
                 {
-                    File.Delete(Path.Combine(GameFolder, newfile[i]));
-                    SwitchLog += $"{newfile[i]} 清理完毕\r\n";
+                    File.Delete(Path.Combine(this.GameFolder, newfile[i]));
+                    this.SwitchLog += $"{newfile[i]} 清理完毕\r\n";
                 }
                 else
                 {
-                    SwitchLog += $"{newfile[i]} 文件不存在，已跳过\r\n";
+                    this.SwitchLog += $"{newfile[i]} 文件不存在，已跳过\r\n";
                 }
             }
-            StateIndicator = "状态：正在还原原始客户端文件";
+            this.StateIndicator = "状态：正在还原原始客户端文件";
 
             string nowGameDataFolder = scheme == GlobalFolderName ? GenshinImpactDataFolderName : YuanShenDataFolderName;
             string originalGameDataFolder = scheme == GlobalFolderName ? YuanShenDataFolderName : GenshinImpactDataFolderName;
 
-            Directory.Move(Path.Combine(GameFolder, nowGameDataFolder), Path.Combine(GameFolder, originalGameDataFolder));
+            Directory.Move(Path.Combine(this.GameFolder, nowGameDataFolder), Path.Combine(this.GameFolder, originalGameDataFolder));
             int total = 0, success = 0;
             for (int a = 0; a < originalfile.Length; a++)
             {
-                string newFileName = Path.Combine(GameFolder, originalfile[a]);
-                if (File.Exists(Path.Combine(GameFolder, originalfile[a] + ".bak")))
+                string newFileName = Path.Combine(this.GameFolder, originalfile[a]);
+                if (File.Exists(Path.Combine(this.GameFolder, originalfile[a] + ".bak")))
                 {
                     Directory.Move(newFileName + ".bak", newFileName);
-                    SwitchLog += $"{originalfile[a]} 还原成功\r\n";
+                    this.SwitchLog += $"{originalfile[a]} 还原成功\r\n";
                     success++;
                 }
                 else
                 {
-                    SwitchLog += $"{originalfile[a]} 跳过还原\r\n";
+                    this.SwitchLog += $"{originalfile[a]} 跳过还原\r\n";
                     total++;
                 }
             }
 
-            StateIndicator = "状态：无状态";
-            SwitchLog += $"还原完毕 , 还原成功 : {success} 个文件 ,还原失败 : {total} 个文件\r\n";
-            SwitchLog += "转换完成，您可以启动游戏了";
+            this.StateIndicator = "状态：无状态";
+            this.SwitchLog += $"还原完毕 , 还原成功 : {success} 个文件 ,还原失败 : {total} 个文件\r\n";
+            this.SwitchLog += "转换完成，您可以启动游戏了";
         }
 
         #region Copy from service
         private IniData? launcherConfig;
         public IniData LauncherConfig
         {
-            get => Requires.NotNull(launcherConfig!, nameof(launcherConfig));
+            get => Requires.NotNull(this.launcherConfig!, nameof(this.launcherConfig));
         }
 
         [MemberNotNullWhen(true, nameof(launcherConfig))]
@@ -466,9 +464,9 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 try
                 {
                     string configPath = Path.Combine(Path.GetDirectoryName(launcherPath)!, ConfigFileName);
-                    launcherConfig = GetIniData(configPath);
-                    string unescapedGameFolder = GetUnescapedGameFolderFromLauncherConfig();
-                    GameFolder = unescapedGameFolder;
+                    this.launcherConfig = this.GetIniData(configPath);
+                    string unescapedGameFolder = this.GetUnescapedGameFolderFromLauncherConfig();
+                    this.GameFolder = unescapedGameFolder;
                 }
                 catch (ParsingException) { return false; }
                 catch (ArgumentNullException) { return false; }
@@ -498,7 +496,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         /// </summary>
         private string GetUnescapedGameFolderFromLauncherConfig()
         {
-            string gameInstallPath = LauncherConfig[LauncherSection][GameInstallPath];
+            string gameInstallPath = this.LauncherConfig[LauncherSection][GameInstallPath];
             string? hex4Result = Regex.Replace(gameInstallPath, @"\\x([0-9a-f]{4})", @"\u$1");
             if (!hex4Result.Contains(@"\u"))//不包含中文
             {
