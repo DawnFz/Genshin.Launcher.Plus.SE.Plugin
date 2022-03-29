@@ -1,11 +1,11 @@
-﻿using DGP.Genshin.Service.Abstraction.Setting;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using DGP.Genshin.Service.Abstraction.Setting;
 using IniParser;
 using IniParser.Exceptions;
 using IniParser.Model;
 using Microsoft;
 using Microsoft.AppCenter.Crashes;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Snap.Core.DependencyInjection;
 using Snap.Data.Utility;
