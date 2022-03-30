@@ -51,6 +51,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             private const string GenshinKey = @"HKEY_CURRENT_USER\Software\miHoYo\原神";
             private const string SdkKey = "MIHOYOSDK_ADL_PROD_CN_h3123967166";
 
+
             public static bool Set(GenshinAccount? account)
             {
                 if (account?.MihoyoSDK is not null)

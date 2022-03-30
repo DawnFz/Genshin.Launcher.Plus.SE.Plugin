@@ -27,3 +27,5 @@ https://pan.baidu.com/s/1-5zQoVfE7ImdXrn8OInKqg
 1.0.0.0 - 测试发布
 
 1.0.3.1 - 修改了大部分逻辑，支持新版SG
+
+1.0.4.0 - 更新了2.6的Pkg文件支持，请务必更新，旧版本不支持新的pkg文件列表
