@@ -189,20 +189,32 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         /// <returns></returns>
         public async Task OpenUIAsync()
         {
+            string pluginVersion = await HtmlHelper.GetInfoFromHtmlAsync("pluginv");
+            if(pluginVersion != "1.0.4.5")
+            {
+                this.SwitchLog += $"插件有新的版本：{pluginVersion}，请更新后再使用本插件提供的服务\r\n";
+                this.IsCloseButtonEnabled = true;
+                this.dialog.IsCloseAllowed = true;
+                return;
+            }
+
             this.PackageVersion = await HtmlHelper.GetInfoFromHtmlAsync("pkg");
 
             if (!string.IsNullOrEmpty(this.GameFolder))
             {
                 this.SwitchLog += $"已成功识别到游戏路径：{this.GameFolder}\r\n当前Pkg最新版本号为：{this.PackageVersion}\r\n";
                 this.ButtonEnabled = true;
+                await this.ConvertGameFileAsync();
             }
             else
             {
                 this.SwitchLog += $"未识别到游戏路径，请先前往左边的[启动游戏]中设置好路径再使用本插件\r\n";
                 this.ButtonEnabled = false;
+                this.IsCloseButtonEnabled = true;
+                this.dialog.IsCloseAllowed = true;
             }
 
-            await this.ConvertGameFileAsync();
+
         }
 
         /// <summary>
