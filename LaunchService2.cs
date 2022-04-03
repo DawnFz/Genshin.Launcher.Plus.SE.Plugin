@@ -291,12 +291,13 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 case SchemeType.Mihoyo:
                     if (!File.Exists(Path.Combine(unescapedGameFolder, "GenshinImpact.exe")))
                     {
+
+                        if (File.Exists(Path.Combine(unescapedGameFolder, "YuanShen_Data/Plugins/PCGameSDK.dll")))
+                        {
+                            File.Delete(Path.Combine(unescapedGameFolder, "YuanShen_Data/Plugins/PCGameSDK.dll"));
+                        }
                         DGP.Genshin.App.Current.Dispatcher.Invoke(async () => await new ConvertDialog().ShowAsync()).Forget();
 
-                        if (File.Exists(Path.Combine(unescapedGameFolder, "GenshinImpact_Data/Plugins/PCGameSDK.dll")))
-                        {
-                            File.Delete(Path.Combine(unescapedGameFolder, "GenshinImpact_Data/Plugins/PCGameSDK.dll"));
-                        }
                     }
                     break;
                 case SchemeType.Bilibili:
@@ -308,12 +309,12 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 case SchemeType.Officical:
                     if (!File.Exists(Path.Combine(unescapedGameFolder, "YuanShen.exe")))
                     {
+                        if (File.Exists(Path.Combine(unescapedGameFolder, "GenshinImpact_Data/Plugins/PCGameSDK.dll")))
+                        {
+                            File.Delete(Path.Combine(unescapedGameFolder, "GenshinImpact_Data/Plugins/PCGameSDK.dll"));
+                        }
                         //await new ContentDialog() { Title = "test", PrimaryButtonText = "Ok" }.ShowAsync();
                         DGP.Genshin.App.Current.Dispatcher.Invoke(async () => await new ConvertDialog().ShowAsync()).Forget();
-                        if (File.Exists(Path.Combine(unescapedGameFolder, "YuanShen_Data/Plugins/PCGameSDK.dll")))
-                        {
-                            File.Delete(Path.Combine(unescapedGameFolder, "YuanShen_Data/Plugins/PCGameSDK.dll"));
-                        }
                     }
                     break;
             }
