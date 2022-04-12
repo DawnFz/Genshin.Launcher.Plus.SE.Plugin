@@ -49,15 +49,25 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         private class GenshinRegistry
         {
             private const string GenshinKey = @"HKEY_CURRENT_USER\Software\miHoYo\原神";
+            private const string GlobalGenshinKey = @"HKEY_CURRENT_USER\Software\miHoYo\Genshin Impact";
             private const string SdkKey = "MIHOYOSDK_ADL_PROD_CN_h3123967166";
+            private const string GlobalSdkKey = "MIHOYOSDK_ADL_PROD_OVERSEA_h1158948810";
 
-
+            private static string? UnescapedGameFolder = new LaunchService2().GetUnescapedGameFolderFromLauncherConfig();
             public static bool Set(GenshinAccount? account)
             {
                 if (account?.MihoyoSDK is not null)
                 {
-                    Registry.SetValue(GenshinKey, SdkKey, Encoding.UTF8.GetBytes(account.MihoyoSDK));
-                    return true;
+                    if (File.Exists(Path.Combine(UnescapedGameFolder, "GenshinImpact.exe")))
+                    {
+                        Registry.SetValue(GlobalGenshinKey, GlobalSdkKey, Encoding.UTF8.GetBytes(account.MihoyoSDK));
+                        return true;
+                    }
+                    else
+                    {
+                        Registry.SetValue(GenshinKey, SdkKey, Encoding.UTF8.GetBytes(account.MihoyoSDK));
+                        return true;
+                    }
                 }
                 return false;
             }
@@ -70,7 +80,15 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             /// <returns></returns>
             public static GenshinAccount? Get()
             {
-                object? sdk = Registry.GetValue(GenshinKey, SdkKey, string.Empty);
+                object? sdk;
+                if (File.Exists(Path.Combine(UnescapedGameFolder, "GenshinImpact.exe")))
+                {
+                    sdk = Registry.GetValue(GlobalGenshinKey, GlobalSdkKey, string.Empty);
+                }
+                else
+                {
+                    sdk = Registry.GetValue(GenshinKey, SdkKey, string.Empty);
+                }
 
                 if (sdk is null)
                 {

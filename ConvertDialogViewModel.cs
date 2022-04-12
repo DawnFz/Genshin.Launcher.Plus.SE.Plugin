@@ -190,9 +190,9 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         public async Task OpenUIAsync()
         {
             string pluginVersion = await HtmlHelper.GetInfoFromHtmlAsync("pluginv");
-            if(pluginVersion != "1.0.5.0")
+            if(pluginVersion != "1.0.6.0")
             {
-                this.SwitchLog += $"插件有新的版本：{pluginVersion}，请更新后再使用本插件提供的服务\r\n";
+                this.SwitchLog += $"\r\n插件有新的版本：{pluginVersion}，请更新后再使用本插件提供的服务\r\n";
                 this.IsCloseButtonEnabled = true;
                 this.dialog.IsCloseAllowed = true;
                 return;
