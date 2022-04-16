@@ -1,4 +1,5 @@
 ﻿using DGP.Genshin.Core.ImplementationSwitching;
+using DGP.Genshin.Core.Notification;
 using DGP.Genshin.DataModel.Launching;
 using DGP.Genshin.FPSUnlocking;
 using DGP.Genshin.Helper;
@@ -9,6 +10,7 @@ using IniParser.Exceptions;
 using IniParser.Model;
 using Microsoft;
 using Microsoft.AppCenter.Crashes;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.VisualStudio.Threading;
 using Microsoft.Win32;
 using ModernWpf.Controls;
@@ -83,11 +85,11 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 object? sdk;
                 if (File.Exists(Path.Combine(UnescapedGameFolder, "GenshinImpact.exe")))
                 {
-                    sdk = Registry.GetValue(GlobalGenshinKey, GlobalSdkKey, string.Empty);
+                    sdk = Registry.GetValue(GlobalGenshinKey, GlobalSdkKey, Array.Empty<byte>());
                 }
                 else
                 {
-                    sdk = Registry.GetValue(GenshinKey, SdkKey, string.Empty);
+                    sdk = Registry.GetValue(GenshinKey, SdkKey, Array.Empty<byte>());
                 }
 
                 if (sdk is null)
@@ -294,7 +296,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             }
             return launcherPath;
         }
-        public void SaveLaunchScheme(LaunchScheme? scheme)
+        public async void SaveLaunchScheme(LaunchScheme? scheme)
         {
             if (scheme is null)
             {
@@ -314,14 +316,18 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                         {
                             File.Delete(Path.Combine(unescapedGameFolder, "YuanShen_Data/Plugins/PCGameSDK.dll"));
                         }
-                        DGP.Genshin.App.Current.Dispatcher.Invoke(async () => await new ConvertDialog().ShowAsync()).Forget();
+                        //DGP.Genshin.App.Current.Dispatcher.Invoke(async () => await new ConvertDialog().ShowAsync()).Forget();
+                        DGP.Genshin.App.Current.Dispatcher.InvokeAsync(new ConvertDialog().ShowAsync).Task.Unwrap().Forget();
 
                     }
                     break;
                 case SchemeType.Bilibili:
                     if (!File.Exists(Path.Combine(unescapedGameFolder, "YuanShen_Data/Plugins/PCGameSDK.dll")))
                     {
-                        new ContentDialog() { Title = "哔哩哔哩SDK不存在", PrimaryButtonText = "确定" }.ShowAsync().Forget();
+                        new ToastContentBuilder()
+                            .AddText("检测到Bilibili Sdk文件不存在，请手动补齐")
+                            .AddText("方法：将PCGameSDK.dll文件放入游戏目录中的YuanShen_Data/Plugins文件夹中")
+                            .SafeShow();
                     }
                     break;
                 case SchemeType.Officical:
@@ -331,8 +337,8 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                         {
                             File.Delete(Path.Combine(unescapedGameFolder, "GenshinImpact_Data/Plugins/PCGameSDK.dll"));
                         }
-                        //await new ContentDialog() { Title = "test", PrimaryButtonText = "Ok" }.ShowAsync();
-                        DGP.Genshin.App.Current.Dispatcher.Invoke(async () => await new ConvertDialog().ShowAsync()).Forget();
+                        //DGP.Genshin.App.Current.Dispatcher.Invoke(async () => await new ConvertDialog().ShowAsync()).Forget();
+                        DGP.Genshin.App.Current.Dispatcher.InvokeAsync(new ConvertDialog().ShowAsync).Task.Unwrap().Forget();
                     }
                     break;
             }

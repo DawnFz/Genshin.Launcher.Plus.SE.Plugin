@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DGP.Genshin.Core.Notification;
 using DGP.Genshin.Service.Abstraction.Setting;
 using IniParser;
 using IniParser.Exceptions;
@@ -190,11 +191,16 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         public async Task OpenUIAsync()
         {
             string pluginVersion = await HtmlHelper.GetInfoFromHtmlAsync("pluginv");
-            if(pluginVersion != "1.0.6.0")
+            if (pluginVersion != "1.0.6.5")
             {
                 this.SwitchLog += $"\r\n插件有新的版本：{pluginVersion}，请更新后再使用本插件提供的服务\r\n";
                 this.IsCloseButtonEnabled = true;
                 this.dialog.IsCloseAllowed = true;
+                new ToastContentBuilder()
+                    .AddText($"插件有新的版本: {pluginVersion}")
+                    .AddText("请更新后再使用本插件提供的服务")
+                    .SafeShow();
+                Browser.Open("https://resource.snapgenshin.com/Plugins/Genshin.Launcher.Plus.SE.Plugin/");
                 return;
             }
 
@@ -365,11 +371,10 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             {
                 DGP.Genshin.App.Current.Dispatcher.Invoke(() =>
                 new ToastContentBuilder()
-                .AddText($"pkg文件存在新版本：{this.PackageVersion}")
-                .AddText("已为您打开下载地址")
-                .Show());
-
-                Browser.Open("https://pan.baidu.com/s/1-5zQoVfE7ImdXrn8OInKqg");
+                   .AddText($"pkg文件存在新版本：{this.PackageVersion}")
+                   .AddText("已为您打开下载地址")
+                   .SafeShow());
+                Browser.Open("https://resource.snapgenshin.com/Plugins/Genshin.Launcher.Plus.SE.Plugin/");
                 return false;
             }
             else
