@@ -23,7 +23,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
     [ViewModel(InjectAs.Transient)]
     public class ConvertDialogViewModel : ObservableObject
     {
-        private readonly string[] globalfiles = new string[]
+                private readonly string[] globalfiles = new string[]
         { "GenshinImpact_Data/app.info",
           "GenshinImpact_Data/globalgamemanagers",
           "GenshinImpact_Data/globalgamemanagers.assets",
@@ -34,25 +34,20 @@ namespace Genshin.Launcher.Plus.SE.Plugin
           "GenshinImpact_Data/Native/UserAssembly.dll",
           "GenshinImpact_Data/Native/UserAssembly.exp",
           "GenshinImpact_Data/Native/UserAssembly.lib",
-          //2.6新加部分
+          //2.8修改部分
           "GenshinImpact_Data/Plugins/ZFProxyWeb.dll",
           "GenshinImpact_Data/Plugins/ZFEmbedWeb.dll",
           "GenshinImpact_Data/Plugins/zf_cef.dll",
-          "GenshinImpact_Data/Plugins/XInputInterface64.dll",
-          "GenshinImpact_Data/Plugins/widevinecdmadapter.dll",
-          "GenshinImpact_Data/Plugins/sqlite3.dll",
           "GenshinImpact_Data/Plugins/Rewired_DirectInput.dll",
           "GenshinImpact_Data/Plugins/metakeeper.dll",
           "GenshinImpact_Data/Plugins/libUbiCustomEvent.dll",
           "GenshinImpact_Data/Plugins/libGLESv2.dll",
           "GenshinImpact_Data/Plugins/libEGL.dll",
-          "GenshinImpact_Data/Plugins/InControlNative.dll",
           "GenshinImpact_Data/Plugins/chrome_elf.dll",
           //
           "GenshinImpact_Data/Plugins/cri_mana_vpx.dll",
           "GenshinImpact_Data/Plugins/cri_vip_unity_pc.dll",
           "GenshinImpact_Data/Plugins/cri_ware_unity.dll",
-          "GenshinImpact_Data/Plugins/d3dcompiler_43.dll",
           "GenshinImpact_Data/Plugins/d3dcompiler_47.dll",
           "GenshinImpact_Data/Plugins/hdiffz.dll",
           "GenshinImpact_Data/Plugins/hpatchz.dll",
@@ -64,7 +59,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
           "GenshinImpact_Data/Plugins/UnityNativeChromaSDK3.dll",
           "GenshinImpact_Data/Plugins/xlua.dll",
           "GenshinImpact_Data/StreamingAssets/20527480.blk",
-          //2.6新加部分
           "mhyprot3.Sys",
           "mhyprot2.Sys",
           //
@@ -85,25 +79,20 @@ namespace Genshin.Launcher.Plus.SE.Plugin
           "YuanShen_Data/Native/UserAssembly.dll",
           "YuanShen_Data/Native/UserAssembly.exp",
           "YuanShen_Data/Native/UserAssembly.lib",
-          //2.6新加部分
+          //2.8修改部分
           "YuanShen_Data/Plugins/ZFProxyWeb.dll",
           "YuanShen_Data/Plugins/ZFEmbedWeb.dll",
           "YuanShen_Data/Plugins/zf_cef.dll",
-          "YuanShen_Data/Plugins/XInputInterface64.dll",
-          "YuanShen_Data/Plugins/widevinecdmadapter.dll",
-          "YuanShen_Data/Plugins/sqlite3.dll",
           "YuanShen_Data/Plugins/Rewired_DirectInput.dll",
           "YuanShen_Data/Plugins/metakeeper.dll",
           "YuanShen_Data/Plugins/libUbiCustomEvent.dll",
           "YuanShen_Data/Plugins/libGLESv2.dll",
           "YuanShen_Data/Plugins/libEGL.dll",
-          "YuanShen_Data/Plugins/InControlNative.dll",
           "YuanShen_Data/Plugins/chrome_elf.dll",
           //
           "YuanShen_Data/Plugins/cri_mana_vpx.dll",
           "YuanShen_Data/Plugins/cri_vip_unity_pc.dll",
           "YuanShen_Data/Plugins/cri_ware_unity.dll",
-          "YuanShen_Data/Plugins/d3dcompiler_43.dll",
           "YuanShen_Data/Plugins/d3dcompiler_47.dll",
           "YuanShen_Data/Plugins/hdiffz.dll",
           "YuanShen_Data/Plugins/hpatchz.dll",
@@ -115,7 +104,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
           "YuanShen_Data/Plugins/UnityNativeChromaSDK3.dll",
           "YuanShen_Data/Plugins/xlua.dll",
           "YuanShen_Data/StreamingAssets/20527480.blk",
-          //2.6新加部分
           "mhyprot3.Sys",
           "mhyprot2.Sys",
           //
@@ -191,7 +179,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         public async Task OpenUIAsync()
         {
             string pluginVersion = await HtmlHelper.GetInfoFromHtmlAsync("pluginv");
-            if (pluginVersion != "1.0.6.5")
+            if (pluginVersion != "1.0.9.0")
             {
                 this.SwitchLog += $"\r\n插件有新的版本：{pluginVersion}，请更新后再使用本插件提供的服务\r\n";
                 this.IsCloseButtonEnabled = true;

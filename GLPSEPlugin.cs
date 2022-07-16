@@ -14,7 +14,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         #region IPlugin
         public string Name
         {
-            get => "GLP.SE-客户端转换";
+            get => "原P.SE-客户端转换";
         }
 
         public string Description
@@ -29,7 +29,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
 
         public Version Version
         {
-            get => new("1.0.6.5");
+            get => new("1.0.9.0");
         }
 
         public bool IsEnabled

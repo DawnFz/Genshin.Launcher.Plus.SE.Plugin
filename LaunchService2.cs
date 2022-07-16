@@ -304,6 +304,8 @@ namespace Genshin.Launcher.Plus.SE.Plugin
             }
 
             string unescapedGameFolder = this.GetUnescapedGameFolderFromLauncherConfig();
+            string bilibiliSdkFile = Path.Combine(unescapedGameFolder, "YuanShen_Data/Plugins/PCGameSDK.dll");
+            string bilibiliSdkBakFile = Path.Combine(unescapedGameFolder, "YuanShen_Data/Plugins/PCGameSDK.dll.bak");
             string configFilePath = Path.Combine(unescapedGameFolder, ConfigFileName);
             Assumes.False(this.GameWatcher.IsWorking, "游戏已经启动");
             switch (scheme.GetSchemeType())
@@ -314,29 +316,77 @@ namespace Genshin.Launcher.Plus.SE.Plugin
 
                         if (File.Exists(Path.Combine(unescapedGameFolder, "YuanShen_Data/Plugins/PCGameSDK.dll")))
                         {
-                            File.Delete(Path.Combine(unescapedGameFolder, "YuanShen_Data/Plugins/PCGameSDK.dll"));
+                            try
+                            {
+                                File.Move(bilibiliSdkFile, bilibiliSdkBakFile);
+                            }
+                            catch
+                            {
+                                new ToastContentBuilder()
+                                .AddText("备份 Bilibili SDK 失败")
+                                .AddText("服务器选项不会保存")
+                                .SafeShow();
+                                return;
+                            }
                         }
                         //DGP.Genshin.App.Current.Dispatcher.Invoke(async () => await new ConvertDialog().ShowAsync()).Forget();
                         DGP.Genshin.App.Current.Dispatcher.InvokeAsync(new ConvertDialog().ShowAsync).Task.Unwrap().Forget();
-
                     }
                     break;
                 case SchemeType.Bilibili:
                     if (!File.Exists(Path.Combine(unescapedGameFolder, "YuanShen_Data/Plugins/PCGameSDK.dll")))
                     {
-                        new ToastContentBuilder()
-                            .AddText("检测到Bilibili Sdk文件不存在，请手动补齐")
-                            .AddText("方法：将PCGameSDK.dll文件放入游戏目录中的YuanShen_Data/Plugins文件夹中")
-                            .SafeShow();
+                        if (File.Exists(bilibiliSdkBakFile))
+                        {
+                            try
+                            {
+                                File.Move(bilibiliSdkBakFile, bilibiliSdkFile);
+                            }
+                            catch
+                            {
+                                new ToastContentBuilder()
+                                    .AddText("还原 Bilibili SDK 的备份失败")
+                                    .AddText("服务器选项不会保存")
+                                    .SafeShow();
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            new ToastContentBuilder()
+                                .AddText("检测到Bilibili Sdk文件不存在，请手动补齐")
+                                .AddText("方法：将PCGameSDK.dll文件放入游戏目录中的YuanShen_Data/Plugins文件夹中")
+                                .SafeShow();
+                            return;
+                        }
+
                     }
                     break;
                 case SchemeType.Officical:
                     if (!File.Exists(Path.Combine(unescapedGameFolder, "YuanShen.exe")))
                     {
-                        if (File.Exists(Path.Combine(unescapedGameFolder, "GenshinImpact_Data/Plugins/PCGameSDK.dll")))
+                        if (File.Exists(bilibiliSdkFile))
                         {
-                            File.Delete(Path.Combine(unescapedGameFolder, "GenshinImpact_Data/Plugins/PCGameSDK.dll"));
+                            try
+                            {
+                                File.Move(bilibiliSdkFile, bilibiliSdkBakFile);
+                            }
+                            catch
+                            {
+                                new ToastContentBuilder()
+                                    .AddText("备份 Bilibili SDK 失败")
+                                    .AddText("服务器选项不会保存")
+                                    .SafeShow();
+                            }
                         }
+                        else
+                        {
+                            new ToastContentBuilder()
+                                    .AddText("未在游戏目录发现 Bilibili SDK")
+                                    .AddText("服务器选项不会保存")
+                                    .SafeShow();
+                        }
+
                         //DGP.Genshin.App.Current.Dispatcher.Invoke(async () => await new ConvertDialog().ShowAsync()).Forget();
                         DGP.Genshin.App.Current.Dispatcher.InvokeAsync(new ConvertDialog().ShowAsync).Task.Unwrap().Forget();
                     }
