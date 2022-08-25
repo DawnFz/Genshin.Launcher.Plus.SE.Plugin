@@ -29,7 +29,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
 
         public Version Version
         {
-            get => new("1.0.9.0");
+            get => new("1.1.0.0");
         }
 
         public bool IsEnabled

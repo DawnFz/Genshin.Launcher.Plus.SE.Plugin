@@ -39,7 +39,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
           "GenshinImpact_Data/Plugins/ZFEmbedWeb.dll",
           "GenshinImpact_Data/Plugins/zf_cef.dll",
           "GenshinImpact_Data/Plugins/Rewired_DirectInput.dll",
-          "GenshinImpact_Data/Plugins/metakeeper.dll",
           "GenshinImpact_Data/Plugins/libUbiCustomEvent.dll",
           "GenshinImpact_Data/Plugins/libGLESv2.dll",
           "GenshinImpact_Data/Plugins/libEGL.dll",
@@ -84,7 +83,6 @@ namespace Genshin.Launcher.Plus.SE.Plugin
           "YuanShen_Data/Plugins/ZFEmbedWeb.dll",
           "YuanShen_Data/Plugins/zf_cef.dll",
           "YuanShen_Data/Plugins/Rewired_DirectInput.dll",
-          "YuanShen_Data/Plugins/metakeeper.dll",
           "YuanShen_Data/Plugins/libUbiCustomEvent.dll",
           "YuanShen_Data/Plugins/libGLESv2.dll",
           "YuanShen_Data/Plugins/libEGL.dll",
@@ -179,7 +177,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
         public async Task OpenUIAsync()
         {
             string pluginVersion = await HtmlHelper.GetInfoFromHtmlAsync("pluginv");
-            if (pluginVersion != "1.0.9.0")
+            if (pluginVersion != "1.1.0.0")
             {
                 this.SwitchLog += $"\r\n插件有新的版本：{pluginVersion}，请更新后再使用本插件提供的服务\r\n";
                 this.IsCloseButtonEnabled = true;
@@ -318,7 +316,7 @@ namespace Genshin.Launcher.Plus.SE.Plugin
                 }
                 else
                 {
-                    this.SwitchLog += $"发生异常：\r\n{ex}\r\n请将该异常反馈给插件作者";
+                    this.SwitchLog += $"发生异常：\r\n{ex}\r\n请将该异常反馈给插件作者\r\n";
                 }
             }
             finally
